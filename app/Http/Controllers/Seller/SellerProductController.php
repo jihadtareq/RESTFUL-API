@@ -31,8 +31,14 @@ class SellerProductController extends ApiController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request ,User $seller)
-    {
+    /*if it was a seller instead of User and 
+     may the seller does not have any product
+     pushed before it would be impossible
+     because the seller in our system who have products pushed before; 
+      */
+ 
+     public function store(Request $request ,User $seller) 
+     {
         $rules=[
             'name'=>'required',
             'description'=>'required',
