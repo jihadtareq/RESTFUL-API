@@ -110,6 +110,7 @@ class SellerProductController extends ApiController
         $this->CheckSeller($seller,$product);
 
         $product->delete();
+        Storage::delete($product->image);
 
         return $this->showOne($product);
 
