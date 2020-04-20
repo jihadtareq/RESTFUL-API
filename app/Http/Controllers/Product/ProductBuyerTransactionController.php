@@ -2,85 +2,68 @@
 
 namespace App\Http\Controllers\Product;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Product;
+use App\User;
+use App\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class ProductBuyerTransactionController extends Controller
+
+class ProductBuyerTransactionController extends ApiController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+    public function store(Request $request,Product $product,User $buyer)
+    {    
+        $rules=[
+            'quantity'=>'required|integer|min:1'
+        ];
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+        $this->validate($request,$rules);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if($buyer->id == $product->seller_id){
+            return $this->errorResponse('The buyer must be different from the seller', 409);
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Product $product)
-    {
-        //
-    }
+        if(!$buyer->isVerified()){
+            return $this->errorResponse('The buyer must be a verified user', 409);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
+        if(!$product->seller->isVerified()){
+            return $this->errorResponse('The seller must be a verified user', 409);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Product $product)
-    {
-        //
-    }
+        if(!$product->isavailable()){
+            return $this->errorResponse('The product is not available', 409);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Product $product)
-    {
-        //
-    }
+        if($product->quantity < $request->quantity){
+            return $this->errorResponse('The product does not have enough units for this transaction',
+             409);
+        }
+
+
+        return DB::transaction(function() use($request , $product, $buyer)
+        {
+            $product->quantity -= $request->quantity;
+            $product->save();
+
+            $transaction=Transaction::create([
+
+                'quantity'=>$request->quantity,
+                'buyer_id'=>$buyer->id,
+                'product_id'=>$product->id,
+            ]);
+
+            return $this->showOne($transaction, 201);
+        });
+        
+        if($product->quantity == 0){
+
+            $product->isUnavailable();
+
+            return 'this is the last quantity';
+        }
+
+
+        }
 }
