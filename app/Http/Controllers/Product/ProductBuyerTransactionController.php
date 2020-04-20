@@ -56,14 +56,6 @@ class ProductBuyerTransactionController extends ApiController
 
             return $this->showOne($transaction, 201);
         });
-        
-        if($product->quantity == 0){
-
-            $product->isUnavailable();
-
-            return 'this is the last quantity';
-        }
-
 
         }
 }

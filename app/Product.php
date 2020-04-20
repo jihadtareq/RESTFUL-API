@@ -29,10 +29,7 @@ class Product extends Model
     public function isavailable(){
         return $this->status == Product::AVAILABLE_PRODUCT;
     }
-
-    public function isUnavailable(){
-        return $this->status == Product::unavailable;
-    }
+    
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
