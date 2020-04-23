@@ -5,6 +5,7 @@ namespace App;
 use App\Transaction;
 use App\Category;
 use App\Seller;
+use App\Transformers\ProductTransformer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,6 +21,9 @@ class Product extends Model
     'name','description',
     'quantity','status',
     'image','seller_id',];
+
+    public $transformer = ProductTransformer::class;
+
 
     
   protected $hidden =[
