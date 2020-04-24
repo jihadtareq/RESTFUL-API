@@ -5,6 +5,7 @@ namespace App\Traits;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Validator;
 
 trait ApiResponser {
 
@@ -71,17 +72,26 @@ trait ApiResponser {
     protected function sortData( Collection $collection , $transformer)
      {
         if (request()->has('sort_by')) {
-            $attribute = $transformer::originalAttributes(request()->sort_by); // equal the value of sort_by request
+             // equal the value of sort_by request
+            $attribute = $transformer::originalAttributes(request()->sort_by);
             $collection = $collection->sortBy->{$attribute};
         }
         return $collection;
      }
 
     protected function paginate(Collection $collection)
-    { 
+    {  
+        $rules =[
+          'per_page'=>'integer|min:1|max:3',
+        ];
+
+        Validator::validate(request()->all(), $rules);
        $page = LengthAwarePaginator::resolveCurrentPage();
 
        $perPage = 2;
+       if (request()->has('per_page')) {
+           $perPage = (int) request()->per_page;
+       }
 
        $results = $collection->slice(($page-1)* $perPage , $perPage)->values();
 
