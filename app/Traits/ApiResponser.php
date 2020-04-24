@@ -24,8 +24,10 @@ trait ApiResponser {
         if($collection->isEmpty()){
             return $this->successResponse(['data' => $collection],$code);
         }
-         //to obtain the transformer directly from property
+         //first() to obtain the transformer directly from property
         $transformer = $collection->first()->transformer;
+
+        $collection = $this->sortData($collection);
 
         $collection = $this->transformData($collection , $transformer); 
       return $this->successResponse( $collection ,$code);
@@ -48,6 +50,16 @@ trait ApiResponser {
  
      }
 
+     protected function sortData( Collection $collection)
+     {
+        if (request()->has('sort_by')) {
+            $attribute = request()->sort_by; // equal the value of sort_by request
+            $collection = $collection->sortBy->{$attribute};
+        }
+        return $collection;
+     }
+     /* it return an array so if we want to create a collection from dataArray it won't work in same way becuz 
+     the transformation is an instance of php fractal class so wa have to use sort before transformDaTa*/  
      protected function transformData($data , $transformer){
 
       $transformation =fractal($data , $transformer);
