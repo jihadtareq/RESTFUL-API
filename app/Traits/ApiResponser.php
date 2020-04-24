@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
 
@@ -32,6 +33,8 @@ trait ApiResponser {
         $collection = $this->sortData($collection ,$transformer);
         $collection = $this->paginate($collection);
         $collection = $this->transformData($collection , $transformer); 
+        $collection = $this->cacheResponse($collection); 
+
       return $this->successResponse( $collection ,$code);
 
     }
@@ -105,9 +108,6 @@ trait ApiResponser {
        return $paginated;
     }
 
-
-
-
      /* it return an array so if we want to create a collection from dataArray it won't work in same way becuz 
      the transformation is an instance of php fractal class so wa have to use sort before transformDaTa*/ 
 
@@ -117,5 +117,23 @@ trait ApiResponser {
       $transformation =fractal($data , new $transformer);
 
       return $transformation->toArray();
+     }
+
+     protected function cacheResponse($data)
+     {
+         $url = request()->url();
+
+         $queryParamter = request()->query();
+
+         ksort($queryParamter);
+
+         $querystring = http_build_query ($queryParamter);
+
+         $fullUrl = "{$url}?{$querystring}";
+ 
+         return Cache::remember($fullUrl,now()->addSeconds(30), function() use($data) {
+             return $data;
+         });
+
      }
 }
