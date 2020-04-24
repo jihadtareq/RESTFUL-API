@@ -27,6 +27,7 @@ trait ApiResponser {
          //first() to obtain the transformer directly from property
         $transformer = $collection->first()->transformer;
 
+        $collection = $this->filterData($collection ,$transformer);
         $collection = $this->sortData($collection ,$transformer);
 
         $collection = $this->transformData($collection , $transformer); 
@@ -46,11 +47,28 @@ trait ApiResponser {
 
     protected function showMessage ($message,$code = 200 ){
 
-        return $this->successResponse(['data' => $message],$code);
- 
+       return $this->successResponse(['data' => $message],$code);
      }
+      /* this method filter data which it makes request on any query 
+      that recieve then we go through every paramter we will recieve one by one 
+      then wa gonna obtain original attribute from that
+      query paramter if it exists and obtain the val
+      then make sure that attribute(not null) and value(not empty or null)
+      are exist then filter collection depend on this */
+    protected function filterData(Collection $collection ,$transformer){
 
-     protected function sortData( Collection $collection , $transformer)
+        foreach (request()->query() as $query => $value) {
+            $attribute = $transformer::originalAttributes($query);
+            if(isset($attribute,$value)){
+             $collection = $collection->where($attribute,$value);
+            }
+        }
+
+        return $collection;
+
+    }   
+
+    protected function sortData( Collection $collection , $transformer)
      {
         if (request()->has('sort_by')) {
             $attribute = $transformer::originalAttributes(request()->sort_by); // equal the value of sort_by request
