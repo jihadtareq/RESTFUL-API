@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ApiResponser {
 
@@ -29,7 +29,7 @@ trait ApiResponser {
 
         $collection = $this->filterData($collection ,$transformer);
         $collection = $this->sortData($collection ,$transformer);
-
+        $collection = $this->paginate($collection);
         $collection = $this->transformData($collection , $transformer); 
       return $this->successResponse( $collection ,$code);
 
@@ -76,6 +76,28 @@ trait ApiResponser {
         }
         return $collection;
      }
+
+    protected function paginate(Collection $collection)
+    { 
+       $page = LengthAwarePaginator::resolveCurrentPage();
+
+       $perPage = 2;
+
+       $results = $collection->slice(($page-1)* $perPage , $perPage)->values();
+
+       $paginated = new LengthAwarePaginator($results , $collection->count() ,$perPage , $page, [
+           'path' => LengthAwarePaginator::resolveCurrentPath(), 
+           //know the next and pervious page depend on a current page or path
+       ]);
+       //add a set query
+       $paginated->appends(request()->all());
+
+       return $paginated;
+    }
+
+
+
+
      /* it return an array so if we want to create a collection from dataArray it won't work in same way becuz 
      the transformation is an instance of php fractal class so wa have to use sort before transformDaTa*/ 
 
