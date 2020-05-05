@@ -59,6 +59,29 @@ class ProductTransformer extends TransformerAbstract
             'creationDate' => 'created_at',
             'lastChange' => 'updated_at',
             'deletedDate' => 'deleted_at',
+            'links' =>[
+                [
+                'rel' =>'self',
+                'href'=>route('products.index',$product->id),
+                ],
+                [
+                    'rel' =>'product.categories',
+                    'href'=>route('products.categories.index',$product->id),
+                ],
+                [
+                    'rel' =>'product.buyers',
+                    'href'=>route('products.buyers.index',$product->id),
+                ],
+                [
+                    'rel' =>'product.transactions',
+                    'href'=>route('categories.sellers.index',$product->id),
+                ],
+                [
+                    //i just need information about the seller
+                    'rel' =>'seller',
+                    'href'=>route('sellers.show',$product->seller_id),
+                ],
+            ]
         ];
 
         return isset($attributes[$index]) ? $attributes[$index] : null;
