@@ -62,7 +62,7 @@ class ProductTransformer extends TransformerAbstract
             'links' =>[
                 [
                 'rel' =>'self',
-                'href'=>route('products.index',$product->id),
+                'href'=>route('products.show',$product->id),
                 ],
                 [
                     'rel' =>'product.categories',
@@ -74,7 +74,7 @@ class ProductTransformer extends TransformerAbstract
                 ],
                 [
                     'rel' =>'product.transactions',
-                    'href'=>route('categories.sellers.index',$product->id),
+                    'href'=>route('products.sellers.index',$product->id),
                 ],
                 [
                     //i just need information about the seller
