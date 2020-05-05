@@ -74,7 +74,7 @@ class ProductTransformer extends TransformerAbstract
                 ],
                 [
                     'rel' =>'product.transactions',
-                    'href'=>route('products.sellers.index',$product->id),
+                    'href'=>route('products.transactions.index',$product->id),
                 ],
                 [
                     //i just need information about the seller
