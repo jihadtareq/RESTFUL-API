@@ -53,6 +53,29 @@ class TransactionTransformer extends TransformerAbstract
             'creationDate' =>'created_at',
             'lastChange' =>'updated_at',
             'deletedDate' =>'deleted_at',
+
+            'links' =>[
+                [
+                'rel' =>'self',
+                'href'=>route('transactions.show',$transaction->id),
+                ],
+                [
+                    'rel' =>'transaction.categories',
+                    'href'=>route('transactions.categories.index',$transaction->id),
+                ],
+                [
+                    'rel' =>'transaction.sellers',
+                    'href'=>route('transactions.sellers.index',$transaction->id),
+                ],
+                [
+                    'rel' =>'product',
+                    'href'=>route('products.show',$transaction->product_id),
+                ],
+                [
+                    'rel' =>'buyer',
+                    'href'=>route('buyers.show',$transaction->buyer_id),
+                ],
+            ]
         ];
 
         return isset($attribute[$index]) ? $attribute[$index] : null ;
