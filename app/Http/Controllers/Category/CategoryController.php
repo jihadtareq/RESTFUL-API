@@ -12,9 +12,10 @@ use App\Transformers\CategoryTransformer;
 class CategoryController extends ApiController
 {   
     public function __construct(){
-        parent::construct();
 
-       $this->middleware('transform.input'.CategoryTransformer::class)->only('store','update');
+        parent::__construct();
+        
+        $this->middleware('transform.input:' . CategoryTransformer::class)->only(['store', 'update']);
     }
     /**
      * Display a listing of the resource.
