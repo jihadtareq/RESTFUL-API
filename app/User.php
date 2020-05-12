@@ -8,11 +8,12 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use App\Transformers\UserTransformer;
+use Laravel\Passport\HasApiTokens;
 
 
 class User extends Authenticatable
-{
-    use Notifiable,SoftDeletes;
+{   
+    use HasApiTokens,Notifiable,SoftDeletes;
 
     const VERIFIED_USER = '1';
     const UNVERIFIED_USER = '0';
